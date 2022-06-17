@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class MainManager : MonoBehaviour
 {
@@ -15,10 +19,11 @@ public class MainManager : MonoBehaviour
     
     private bool m_Started = false;
     private int m_Points;
-    
     private bool m_GameOver = false;
+    [SerializeField] TextMeshProUGUI recordText;
+    [SerializeField] TextMeshProUGUI playerText;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -36,6 +41,9 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        PersistentManager.instance.LoadRecord();
+        recordText.text = PersistentManager.actualRecord;
+        playerText.text = PersistentManager.actualName;
     }
 
     private void Update()
@@ -72,5 +80,15 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        if(m_Points > PersistentManager.record)
+        {
+            PersistentManager.record = m_Points;
+            PersistentManager.instance.SaveRecord();
+        }     
+    }
+
+    public void Return()
+    {
+        SceneManager.LoadScene(0);
     }
 }
